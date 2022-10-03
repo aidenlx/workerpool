@@ -3,6 +3,7 @@
 var Promise = require('./Promise');
 var environment = require('./environment');
 var requireFoolWebpack = require('./requireFoolWebpack');
+const { IFrameWorker } = require('iframe-worker');
 
 /**
  * Special message sent by parent which causes a child process worker to terminate itself.
@@ -68,7 +69,9 @@ function getDefaultWorker() {
 }
 
 function setupWorker(script, options) {
-  if (options.workerType === 'web') { // browser only
+  if (options.workerType === 'iframe') {
+    return setupBrowserWorker(script, IFrameWorker, options);
+  } else if (options.workerType === 'web') { // browser only
     ensureWebWorker();
     return setupBrowserWorker(script, Worker, options);
   } else if (options.workerType === 'thread') { // node.js only

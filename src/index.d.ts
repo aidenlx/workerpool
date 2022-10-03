@@ -104,7 +104,7 @@ export interface WorkerPoolOptions {
      * - In case of `'thread'`, `worker_threads` will be used. If `worker_threads` are not available, an error is thrown.
      *   Only available in a node.js environment.
      */
-    workerType?: 'auto' | 'web' | 'process' | 'thread' | undefined;
+    workerType?: 'auto' | 'web' | 'process' | 'thread' | 'iframe' | undefined;
 
     /** 2nd argument to pass to childProcess.fork() */
     forkArgs?: string[] | undefined;
