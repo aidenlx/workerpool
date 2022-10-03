@@ -143,7 +143,7 @@ worker.on('message', async function (request) {
       result: null,
       error: convertError(err)
     });
-    console.error(error);
+    console.error(err);
   }
 });
 
