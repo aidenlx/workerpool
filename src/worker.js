@@ -111,7 +111,7 @@ worker.methods.methods = function methods() {
 
 var currentRequestId = null;
 
-worker.on('message', async function (request) {
+worker.on('message', function (request) {
   if (request === TERMINATE_METHOD_ID) {
     return worker.exit(0);
   }
@@ -122,16 +122,38 @@ worker.on('message', async function (request) {
       currentRequestId = request.id;
       
       // execute the function
-      var result = await method.apply(method, request.params);
+      var result = method.apply(method, request.params);
 
-      // immediate result
-      worker.send({
-        id: request.id,
-        result: result,
-        error: null
-      });
+      if (isPromise(result)) {
+        // promise returned, resolve this and then return
+        result
+            .then(function (result) {
+              worker.send({
+                id: request.id,
+                result: result,
+                error: null
+              });
+              currentRequestId = null;
+            })
+            .catch(function (err) {
+              worker.send({
+                id: request.id,
+                result: null,
+                error: convertError(err)
+              });
+              currentRequestId = null;
+            });
+      }
+      else {
+        // immediate result
+        worker.send({
+          id: request.id,
+          result: result,
+          error: null
+        });
 
-      currentRequestId = null;
+        currentRequestId = null;
+      }
     }
     else {
       throw new Error('Unknown method "' + request.method + '"');
@@ -143,7 +165,6 @@ worker.on('message', async function (request) {
       result: null,
       error: convertError(err)
     });
-    console.error(err);
   }
 });
 
