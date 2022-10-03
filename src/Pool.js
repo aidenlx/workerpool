@@ -23,6 +23,7 @@ function Pool(script, options) {
 
   options = options || {};
 
+  this.name = options.name || `workerpool ${Date.now()}`;
   this.forkArgs = Object.freeze(options.forkArgs || []);
   this.forkOpts = Object.freeze(options.forkOpts || {});
   this.debugPortStart = (options.debugPortStart || 43210);
@@ -394,7 +395,8 @@ Pool.prototype._createWorkerHandler = function () {
     forkArgs: overridenParams.forkArgs || this.forkArgs,
     forkOpts: overridenParams.forkOpts || this.forkOpts,
     debugPort: DEBUG_PORT_ALLOCATOR.nextAvailableStartingAt(this.debugPortStart),
-    workerType: this.workerType
+    workerType: this.workerType,
+    name: this.name,
   });
 }
 
